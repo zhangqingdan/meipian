@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<link rel="stylesheet" href="index.css">
+	<title>美篇</title>
+	<style>
+	.user-info,.music,.bottom{
+		display: flex;
+	}
+	.user-info{
+		height: 1rem;
+		width: 100%;
+		justify-content: space-between;
+	}
+	.user-photo{
+		flex: 0 1 1rem;
+	}
+	.diary-info{
+		flex: 0 1 auto;
+	}
+	.visit-info{
+		display: flex;
+		flex: 0 1 auto;
+	}
+	.like,.visit{
+		flex: 1;
+	}
+	.bottom{
+		justify-content: space-between;
+	}
+
+	</style>
+	<script>
+		;(function(win, lib) {
+	    var doc = win.document;
+	    var docEl = doc.documentElement;
+	    var metaEl = doc.querySelector('meta[name="viewport"]');
+	    var flexibleEl = doc.querySelector('meta[name="flexible"]');
+	    var dpr = 0;
+	    var scale = 0;
+	    var tid;
+	    var flexible = lib.flexible || (lib.flexible = {});
+
+	    if (metaEl) {
+	      var match = metaEl.getAttribute('content').match(/initial\-scale=([\d\.]+)/);
+	      if (match) {
+	        scale = parseFloat(match[1]);
+	        dpr = parseInt(1 / scale);
+	      }
+	    } else if (flexibleEl) {
+	      var content = flexibleEl.getAttribute('content');
+	      if (content) {
+	        var initialDpr = content.match(/initial\-dpr=([\d\.]+)/);
+	        var maximumDpr = content.match(/maximum\-dpr=([\d\.]+)/);
+	        if (initialDpr) {
+	          dpr = parseFloat(initialDpr[1]);
+	          scale = parseFloat((1 / dpr).toFixed(2));
+	        }
+	        if (maximumDpr) {
+	          dpr = parseFloat(maximumDpr[1]);
+	          scale = parseFloat((1 / dpr).toFixed(2));
+	        }
+	      }
+	    }
+
+	    if (!dpr && !scale) {
+	      var isAndroid = win.navigator.appVersion.match(/android/gi);
+	      var isIPhone = win.navigator.appVersion.match(/iphone/gi);
+	      var devicePixelRatio = win.devicePixelRatio;
+	      if (isIPhone) {
+	        // iOS下，对于2和3的屏，用2倍的方案，其余的用1倍方案
+	        if (devicePixelRatio >= 3 && (!dpr || dpr >= 3)) {
+	          dpr = 3;
+	        } else if (devicePixelRatio >= 2 && (!dpr || dpr >= 2)) {
+	          dpr = 2;
+	        } else {
+	          dpr = 1;
+	        }
+	      } else {
+	        // 其他设备下，仍旧使用1倍的方案
+	        dpr = 1;
+	      }
+	      scale = 1 / dpr;
+	    }
+
+	    docEl.setAttribute('data-dpr', dpr);
+	    if (!metaEl) {
+	      metaEl = doc.createElement('meta');
+	      metaEl.setAttribute('name', 'viewport');
+	      metaEl.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no');
+	      if (docEl.firstElementChild) {
+	        docEl.firstElementChild.appendChild(metaEl);
+	      } else {
+	        var wrap = doc.createElement('div');
+	        wrap.appendChild(metaEl);
+	        doc.write(wrap.innerHTML);
+	      }
+	    }
+
+	    function refreshRem() {
+	      var width = docEl.getBoundingClientRect().width;
+	      if (width / dpr > 540) {
+	        width = 540 * dpr;
+	      }
+	      var rem = width / 10;
+	      docEl.style.fontSize = rem + 'px';
+	      flexible.rem = win.rem = rem;
+	    }
+
+	    win.addEventListener('resize', function() {
+	      clearTimeout(tid);
+	      tid = setTimeout(refreshRem, 300);
+	    }, false);
+	    win.addEventListener('pageshow', function(e) {
+	      if (e.persisted) {
+	        clearTimeout(tid);
+	        tid = setTimeout(refreshRem, 300);
+	      }
+	    }, false);
+
+	    if (doc.readyState === 'complete') {
+	      doc.body.style.fontSize = 12 * dpr + 'px';
+	    } else {
+	      doc.addEventListener('DOMContentLoaded', function(e) {
+	        doc.body.style.fontSize = 12 * dpr + 'px';
+	      }, false);
+	    }
+
+
+	    refreshRem();
+
+	    flexible.dpr = win.dpr = dpr;
+	    flexible.refreshRem = refreshRem;
+	    flexible.rem2px = function(d) {
+	      var val = parseFloat(d) * this.rem;
+	      if (typeof d === 'string' && d.match(/rem$/)) {
+	        val += 'px';
+	      }
+	      return val;
+	    }
+	    flexible.px2rem = function(d) {
+	      var val = parseFloat(d) / this.rem;
+	      if (typeof d === 'string' && d.match(/px$/)) {
+	        val += 'rem';
+	      }
+	      return val;
+	    }
+
+	  })(window, window['lib'] || (window['lib'] = {}));
+	</script>
+</head>
+<body id='body'>
+	
+	<div class="title" id="title">吃货之旅</div>
+	<div class="user-info">
+		<div>
+			<div class="user-photo" id="photo"></div>
+			<div class="diary-info">
+				<div class="diary-title" id="username">小百合</div>
+				<div class="diary-time" id="time">2016.08.15</div>
+			</div>
+			
+		</div>
+		
+		<div class="visit-info">
+			<div class="like" id="like">1244</div>
+			<i class="divider"></i>
+			<div class="visit" id="visit">1244</div>
+		</div>
+	</div>
+	<div class="music">
+		<audio src="" loop="true" id='audio'></audio>
+		<i class="music-btn" id='music-btn'></i>
+		<p id="musicName">稳稳的幸福-陈奕迅</p>
+	</div>
+	<div class="container" id="container"></div>
+	<div class="bottom">
+		<div>
+			<span>阅读</span>
+			<span id='subjectFavoed'>000</span>
+			
+		</div>
+		
+		<div class="jubao" id='jubao'>举报</div>
+	</div>
+	<div class="alert" id='alert'>
+		<div></div>
+		<span>举报成功</span>
+	</div>
+	<script src="./reqwest.min.js"></script>
+	<script src="./jquery.js"></script>
+	<script src="./index.js"></script>
+</body>
+
+</html>
